@@ -4,9 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Post;
+use Illuminate\Support\Facades\Auth;
 
 class PostsController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['index', 'show']);
+    }
+
     public function index() {
         $posts = Post::all();
         return view('posts.index', compact('posts'));
@@ -21,7 +28,8 @@ class PostsController extends Controller
             'title' => 'required',
             'body' => 'required'
         ]);
-        Post::create(request(['title', 'body']));
+
+        Auth::user()->publish(new Post(request(['title', 'body'])));
         return redirect('/posts');
     }
 
